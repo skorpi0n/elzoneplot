@@ -11,8 +11,10 @@ df['hour']=df.index
 df['y']=df['hour'].apply(lambda x: int(x/120))
 df['x']=df['hour'].apply(lambda x: int(x%120))
 
-# Set export to orange and import to grey.
-df['color'] = df['balance'].apply(lambda x: 'orange' if x < 0 else 'grey')
+# Set colors for export and import
+export_color = 'orange'
+import_color = 'grey'
+df['color'] = df['balance'].apply(lambda x: export_color if x < 0 else import_color)
 
 # Plot the data.
 ax = df.plot(kind='scatter', x='x', y='y', c='color')
