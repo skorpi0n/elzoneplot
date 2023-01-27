@@ -1,0 +1,5 @@
+*
+!.gitignore
+!dotplot.py
+!README.md
+!requirements.txt
