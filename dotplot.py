@@ -1,9 +1,15 @@
 from matplotlib import pyplot as plt
+import requests
 import pandas as pd
 
-# Import data and rename relevant column.
-file_path = input()
-df = pd.read_excel(file_path, header=6, usecols=['Import/export'])
+# Get data from file "Förbrukning och tillförsel per timme (i normaltid)"
+# Statistics available at https://www.svk.se/om-kraftsystemet/kraftsystemdata/elstatistik/
+url = 'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/forbrukning-tillforsel-per-timme/n_fot2022-01-12.xls' # Data for 2022
+r = requests.get(url)
+open('Förbrukning och tillförsel per timme (i normaltid).xls', 'wb').write(r.content)
+
+# Put the data in a dataframe.
+df = pd.read_excel('Förbrukning och tillförsel per timme (i normaltid).xls', header=6, usecols=['Import/export'])
 df.rename(columns={'Import/export': 'balance'}, inplace=True)
 
 # Create columns.
