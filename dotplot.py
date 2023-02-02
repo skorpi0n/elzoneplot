@@ -6,7 +6,7 @@ import pandas as pd
 # Statistics available at https://www.svk.se/om-kraftsystemet/kraftsystemdata/elstatistik/
 url = 'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/forbrukning-tillforsel-per-timme/n_fot2022-01-12.xls' # Data for 2022
 r = requests.get(url)
-open('Förbrukning och tillförsel per timme (i normaltid).xls', 'wb').write(r.content)
+open('Förbrukning och tillförsel per timme (i normaltid).xlsx', 'wb').write(r.content)
 
 # Put the data in a dataframe.
 df = pd.read_excel('Förbrukning och tillförsel per timme (i normaltid).xls', header=6, usecols=['Import/export'])
