@@ -134,7 +134,7 @@ def main(argv):
 	
 	# Plot the data.
 	#ax = df.plot(kind='scatter', x='x', y='y', c='color')
-	ax = df3.plot(kind='scatter', x='x', y='y', c='color')
+	ax = df3.plot(kind='scatter', x='x', y='y', c='color', title=zone)
 	
 	# Hide irrelevant names on axes.
 	ax.axes.get_xaxis().set_visible(False)
