@@ -68,25 +68,26 @@ def main(argv):
 	# Statistics available at https://www.svk.se/om-kraftsystemet/kraftsystemdata/elstatistik/
 
 	urlDict={
-		2022:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2022-01-12.xls',
-		2021:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2021-01-12.xls',
-		2020:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2020-01-12.xls',
-		2019:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2019-01-12.xls',
-		2018:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2018-01-12.xls',
-		2017:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2017-01-12.xls',
-		2016:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2016-01-12.xls',
-		2015:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/statistik-per-timme-och-elomrade-2015.xls',
-		2014:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2014-01-12.xls',
-		2013:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2013-01-12.xls',
-		2012:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2012-01-12.xls',
-		2011:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2011-01-12.xls',
+		2007:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden_2007.xls',
+		2008:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden2008.xls',
+		2009:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden2009.xls',
 		2010:{
 			0:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2010-01-till-06.xls',
 			1:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2010-07-till-12.xls'
 		},
-		2009:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden2009.xls',
-		2008:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden2008.xls',
-		2007:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden_2007.xls'
+		2011:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2011-01-12.xls',
+		2012:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2012-01-12.xls',
+		2013:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2013-01-12.xls',
+		2014:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2014-01-12.xls',
+		2015:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/statistik-per-timme-och-elomrade-2015.xls',
+		2016:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2016-01-12.xls',
+		2017:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2017-01-12.xls',
+		2018:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2018-01-12.xls',
+		2019:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2019-01-12.xls',
+		2020:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2020-01-12.xls',
+		2021:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2021-01-12.xls',
+		2022:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2022-01-12.xls',
+		2023:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/timvarden-2023-01-02.xls'
 	}
 	
 	#This dict contains the indexes for the consumption columns by year
@@ -190,6 +191,12 @@ def main(argv):
 			'SE4':[4,8,12,16,41,45]
 		},
 		2022:{
+			'SE1':[1,5,9,13,38,42],
+			'SE2':[2,6,10,14,39,43],
+			'SE3':[3,7,11,15,40,44],
+			'SE4':[4,8,12,16,41,45]
+		},
+		2023:{
 			'SE1':[1,5,9,13,38,42],
 			'SE2':[2,6,10,14,39,43],
 			'SE3':[3,7,11,15,40,44],
@@ -302,6 +309,12 @@ def main(argv):
 			'SE2':[18,22,26,   31,35],	#No nuclear
 			'SE3':[19,23,27,29,32,36],
 			'SE4':[20,24,28,   33,37]	#No nuclear
+		},
+		2023:{
+			'SE1':[17,21,25,   30,34],	#No nuclear
+			'SE2':[18,22,26,   31,35],	#No nuclear
+			'SE3':[19,23,27,29,32,36],
+			'SE4':[20,24,28,   33,37]	#No nuclear
 		}
 	}
 
@@ -326,7 +339,8 @@ def main(argv):
 		2019:[1,2,3,4],
 		2020:[1,2,3,4],
 		2021:[1,2,3,4],
-		2022:[1,2,3,4]
+		2022:[1,2,3,4],
+		2023:[1,2,3,4]
 	}
 
 	def getDataframe(fname, year, i=-1):
@@ -411,8 +425,10 @@ def main(argv):
 		dfa3 = getDataframe('Statistik per elområde och timme, ' + str(year) + '_01-till-06.xlsx', year, 0)
 		dfb3 = getDataframe('Statistik per elområde och timme, ' + str(year) + '_07-till-12.xlsx', year, 1)
 		df3 = pd.concat([dfa3, dfb3],ignore_index=True)
-	elif year >= 2011 and year <= 2022:
+	elif year >= 2011 and year <= datetime.now().year:
 		df3 = getDataframe('Statistik per elområde och timme, ' + str(year) + '.xlsx', year, -1)
+	else:
+		sys.exit('Something went wrong')
 
 	colAggDict={
 		'datetime':'first',
@@ -499,7 +515,10 @@ def main(argv):
 		print('Balance: ' + str(math.ceil(df4['balance_SE4'].sum())) + ' MWh')
 		print('Self-sufficient to: ' + str(selfSufficient) + '%')
 
-	title='Zone ' + str(zone) + ' self-sufficient to ' + str(selfSufficient) + '%'
+	if year == datetime.now().year:
+		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' self-sufficient to ' + str(selfSufficient) + '%'
+	else:
+		title='Zone ' + str(zone) + ' ' + str(year) + ' self-sufficient to ' + str(selfSufficient) + '%'
 
 	#Plot the data
 	ax = df4.plot(kind='scatter', x='x', y='y', c='color', title=title)
