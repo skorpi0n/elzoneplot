@@ -59,6 +59,8 @@ def main(argv):
 		elif opt in ("-o", "--output"):
 			if arg.lower() == 'std':
 				output = 'STDOUT'
+			elif arg.lower() == 'plot':
+				output = 'PLOT'
 			else:
 				output = arg
 
@@ -540,8 +542,8 @@ def main(argv):
 	else:
 		title='Zone ' + str(zone) + ' ' + str(year) + ' (' + groupby.lower() + 'ly)'
 
-	#These dataframes are just dummys to create labels
-	#Another solution would have been to split the main dataframe by color-value, but that caused color with no data to not be displayed
+	#These dataframes are just dummys to create labels for export/orange and import/grey
+	#Another solution would have been to split the main dataframe by color-value, but that caused colors with no data to not be displayed
 	importLabel_df = pd.DataFrame([[0, 0, import_color]], columns=['x', 'y', 'color'])
 	exportLabel_df = pd.DataFrame([[0, 0, export_color]], columns=['a', 'b', 'color'])
 
@@ -554,16 +556,19 @@ def main(argv):
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
 
-	#Add description to the bottom
+	#Add text to the bottom
 	plt.text(5, -12, textStr)
 
-	#Show plot.
-	plt.show()
+	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
+	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
 
 	if output == 'STDOUT':
 #		pd.set_option('display.max_columns', None)
 		pd.set_option('display.max_rows', None)
 		print(df4)
+	elif output == 'PLOT':
+		#Show plot
+		plt.show()
 	elif output != '':
 		print('Saving dataframe to: ', output, sep='')
 		df4.to_csv(output, sep='\t', encoding='utf-8')
