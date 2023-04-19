@@ -370,11 +370,10 @@ def main(argv):
 		dotCount=str(df.iloc[:, 0].iloc[0]).count('.')
 		dashCount=str(df.iloc[:, 0].iloc[0]).count('-')
 		colonCount=str(df.iloc[:, 0].iloc[0]).count(':')
+		df2 = pd.DataFrame()
 		if dotCount == 0 and dashCount == 0 and colonCount == 0:
-			df2 = pd.DataFrame()
 			df2['datetime'] = pd.to_datetime(df.iloc[:, 0], format="%Y%m%d", dayfirst=True) + pd.to_timedelta((df.iloc[:, 1] / 100), unit='h')
 		elif (dotCount == 2 and dashCount == 0 and colonCount == 1) or (dotCount == 0 and dashCount == 2 and colonCount == 2):
-			df2 = pd.DataFrame()
 #			df2['datetime'] = pd.to_datetime(df.iloc[:, 0], format="%d.%m.%Y %H:%M")
 			df2['datetime'] = pd.to_datetime(df.iloc[:, 0], dayfirst=True)
 		else:
@@ -450,6 +449,8 @@ def main(argv):
 		'production_SE3':'sum',
 		'production_SE4':'sum'
 	}
+
+	#This sets the x and y position of each point
 	if groupby == '' or groupby == 'HOUR':
 		df4=df3[[
 			'datetime','year','week',
@@ -476,7 +477,6 @@ def main(argv):
 		df4['y']=df4['hour'].apply(lambda x: int(x/3))
 		df4['x']=df4['hour'].apply(lambda x: int(x%3))
 
-
 	export_color = 'orange'
 	import_color = 'grey'
 	if zone == 'SE':
@@ -485,28 +485,44 @@ def main(argv):
 		print('Production: ' + str(math.ceil(df4['production_SE'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE'].sum()))) + ' MWh')
 		print('Balance: ' + str(math.ceil(df4['balance_SE'].sum())) + ' MWh')
-		print('Self-sufficient to: ' + str(selfSufficient) + '%')
+		print('Self-sufficient: ' + str(selfSufficient) + '%')
+		textStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_SE'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE'].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4['balance_SE'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
+		))
 	elif zone == 'SE1':
 		df4['color'] = df4['balance_SE1'].apply(lambda x: export_color if x > 0 else import_color)
 		selfSufficient=math.ceil(df4['production_SE1'].sum()/abs(df4['consumption_SE1'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE1'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE1'].sum()))) + ' MWh')
 		print('Balance: ' + str(math.ceil(df4['balance_SE1'].sum())) + ' MWh')
-		print('Self-sufficient to: ' + str(selfSufficient) + '%')
+		print('Self-sufficient: ' + str(selfSufficient) + '%')
+		textStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_SE1'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE1'].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4['balance_SE1'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
+		))
 	elif zone == 'SE2':
 		df4['color'] = df4['balance_SE2'].apply(lambda x: export_color if x > 0 else import_color)
 		selfSufficient=math.ceil(df4['production_SE2'].sum()/abs(df4['consumption_SE2'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE2'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE2'].sum()))) + ' MWh')
 		print('Balance: ' + str(math.ceil(df4['balance_SE2'].sum())) + ' MWh')
-		print('Self-sufficient to: ' + str(selfSufficient) + '%')
+		print('Self-sufficient: ' + str(selfSufficient) + '%')
+		textStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_SE2'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE2'].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4['balance_SE2'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
+		))
 	elif zone == 'SE3':
 		df4['color'] = df4['balance_SE3'].apply(lambda x: export_color if x > 0 else import_color)
 		selfSufficient=math.ceil(df4['production_SE3'].sum()/abs(df4['consumption_SE3'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh')
 		print('Balance: ' + str(math.ceil(df4['balance_SE3'].sum())) + ' MWh')
-		print('Self-sufficient to: ' + str(selfSufficient) + '%')
+		print('Self-sufficient: ' + str(selfSufficient) + '%')
+		textStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4['balance_SE3'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
+		))
 	elif zone == 'SE4':
 		df4['color'] = df4['balance_SE4'].apply(lambda x: export_color if x > 0 else import_color)
 		selfSufficient=math.ceil(df4['production_SE4'].sum()/abs(df4['consumption_SE4'].sum())*1000)/10
@@ -514,23 +530,35 @@ def main(argv):
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE4'].sum()))) + ' MWh')
 		print('Balance: ' + str(math.ceil(df4['balance_SE4'].sum())) + ' MWh')
 		print('Self-sufficient to: ' + str(selfSufficient) + '%')
+		textStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_SE4'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE4'].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4['balance_SE4'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
+		))
 
 	if year == datetime.now().year:
-		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' self-sufficient to ' + str(selfSufficient) + '%'
+		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' (' + groupby.lower() + 'ly)'
 	else:
-		title='Zone ' + str(zone) + ' ' + str(year) + ' self-sufficient to ' + str(selfSufficient) + '%'
+		title='Zone ' + str(zone) + ' ' + str(year) + ' (' + groupby.lower() + 'ly)'
+
+	#These dataframes are just dummys to create labels
+	#Another solution would have been to split the main dataframe by color-value, but that caused color with no data to not be displayed
+	importLabel_df = pd.DataFrame([[0, 0, import_color]], columns=['x', 'y', 'color'])
+	exportLabel_df = pd.DataFrame([[0, 0, export_color]], columns=['a', 'b', 'color'])
 
 	#Plot the data
-	ax = df4.plot(kind='scatter', x='x', y='y', c='color', title=title)
-	
+	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label='Import')
+	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label='Export', ax=ax)
+	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax)
+
 	#Hide irrelevant names on axes.
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
 
+	#Add description to the bottom
+	plt.text(5, -12, textStr)
+
 	#Show plot.
 	plt.show()
-
-	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '.png')
 
 	if output == 'STDOUT':
 #		pd.set_option('display.max_columns', None)
