@@ -486,6 +486,8 @@ def main(argv):
 	#Colorize a column based on value of balance in zone
 	if zone == 'SE':
 		df4['color'] = df4['balance_SE'].apply(lambda x: export_color if x > 0 else import_color)
+		importLabel='Import (' + str((df4['balance_SE'] < 0).sum()) + ' ' + groupby.lower() + 's)'
+		exportLabel='Export (' + str((df4['balance_SE'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
 		selfSufficient=math.ceil(df4['production_SE'].sum()/abs(df4['consumption_SE'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE'].sum()))) + ' MWh')
@@ -497,6 +499,8 @@ def main(argv):
 		))
 	elif zone == 'SE1':
 		df4['color'] = df4['balance_SE1'].apply(lambda x: export_color if x > 0 else import_color)
+		importLabel='Import (' + str((df4['balance_SE1'] < 0).sum()) + ' ' + groupby.lower() + 's)'
+		exportLabel='Export (' + str((df4['balance_SE1'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
 		selfSufficient=math.ceil(df4['production_SE1'].sum()/abs(df4['consumption_SE1'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE1'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE1'].sum()))) + ' MWh')
@@ -508,6 +512,8 @@ def main(argv):
 		))
 	elif zone == 'SE2':
 		df4['color'] = df4['balance_SE2'].apply(lambda x: export_color if x > 0 else import_color)
+		importLabel='Import (' + str((df4['balance_SE2'] < 0).sum()) + ' ' + groupby.lower() + 's)'
+		exportLabel='Export (' + str((df4['balance_SE2'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
 		selfSufficient=math.ceil(df4['production_SE2'].sum()/abs(df4['consumption_SE2'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE2'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE2'].sum()))) + ' MWh')
@@ -519,6 +525,10 @@ def main(argv):
 		))
 	elif zone == 'SE3':
 		df4['color'] = df4['balance_SE3'].apply(lambda x: export_color if x > 0 else import_color)
+		importLabel='Import (' + str((df4['balance_SE3'] < 0).sum()) + ' ' + groupby.lower() + 's)'
+		exportLabel='Export (' + str((df4['balance_SE3'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
+		print((df4['balance_SE3'] < 0).sum())
+		print((df4['balance_SE3'] >= 0).sum())
 		selfSufficient=math.ceil(df4['production_SE3'].sum()/abs(df4['consumption_SE3'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh')
@@ -530,6 +540,8 @@ def main(argv):
 		))
 	elif zone == 'SE4':
 		df4['color'] = df4['balance_SE4'].apply(lambda x: export_color if x > 0 else import_color)
+		importLabel='Import (' + str((df4['balance_SE4'] < 0).sum()) + ' ' + groupby.lower() + 's)'
+		exportLabel='Export (' + str((df4['balance_SE4'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
 		selfSufficient=math.ceil(df4['production_SE4'].sum()/abs(df4['consumption_SE4'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE4'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE4'].sum()))) + ' MWh')
@@ -551,8 +563,8 @@ def main(argv):
 	exportLabel_df = pd.DataFrame([[0, 0, export_color]], columns=['a', 'b', 'color'])
 
 	#Plot the data
-	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label='Import') #, s=6
-	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label='Export', ax=ax) #, s=6
+	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label=importLabel) #, s=6
+	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label=exportLabel, ax=ax) #, s=6
 	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax) #, s=6
 
 	#Hide irrelevant names on axes.
@@ -560,7 +572,10 @@ def main(argv):
 	ax.axes.get_yaxis().set_visible(False)
 
 	#Add text to the bottom
-	plt.text(5, -12, textStr)
+	plt.text(5, -10, textStr)
+
+	sourceStr = 'Source: svk.se > Statistik per elområde och timme. Made with https://github.com/skorpi0n/elzoneplot'
+	plt.text(-15, -14, sourceStr, fontsize=8)
 
 	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
 	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
