@@ -47,7 +47,8 @@ def main(argv):
 #			elif  arg == '':
 #				zone = 'SE'
 			else:
-				sys.exit('Not a known zone: ', arg)
+				print('Not a known zone: ', arg)
+				sys.exit()
 		elif opt in ("-g", "--group"):
 			arg=arg.upper()
 			if arg == 'MONTH' or arg == 'WEEK' or arg == 'DAY' or arg == 'HOUR':
@@ -55,7 +56,8 @@ def main(argv):
 			elif arg == '':
 				groupby = 'HOUR'
 			else:
-				sys.exit('Not a known groupby command: ', arg)
+				print('Not a known groupby command: ', arg)
+				sys.exit()
 		elif opt in ("-o", "--output"):
 			if arg.lower() == 'std':
 				output = 'STDOUT'
@@ -481,6 +483,7 @@ def main(argv):
 
 	export_color = 'orange'
 	import_color = 'grey'
+	#Colorize a column based on value of balance in zone
 	if zone == 'SE':
 		df4['color'] = df4['balance_SE'].apply(lambda x: export_color if x > 0 else import_color)
 		selfSufficient=math.ceil(df4['production_SE'].sum()/abs(df4['consumption_SE'].sum())*1000)/10
@@ -548,9 +551,9 @@ def main(argv):
 	exportLabel_df = pd.DataFrame([[0, 0, export_color]], columns=['a', 'b', 'color'])
 
 	#Plot the data
-	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label='Import')
-	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label='Export', ax=ax)
-	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax)
+	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label='Import') #, s=6
+	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label='Export', ax=ax) #, s=6
+	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax) #, s=6
 
 	#Hide irrelevant names on axes.
 	ax.axes.get_xaxis().set_visible(False)
