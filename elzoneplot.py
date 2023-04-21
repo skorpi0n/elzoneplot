@@ -6,10 +6,8 @@ from datetime import datetime
 
 year = datetime.now().year
 zone = ''
-groupby = 'HOUR'	#default
+groupby = 'HOUR'
 output = ''
-
-print(1)
 
 def main(argv):
 	global year
