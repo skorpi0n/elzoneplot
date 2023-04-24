@@ -527,8 +527,6 @@ def main(argv):
 		df4['color'] = df4['balance_SE3'].apply(lambda x: export_color if x > 0 else import_color)
 		importLabel='Import (' + str((df4['balance_SE3'] < 0).sum()) + ' ' + groupby.lower() + 's)'
 		exportLabel='Export (' + str((df4['balance_SE3'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		print((df4['balance_SE3'] < 0).sum())
-		print((df4['balance_SE3'] >= 0).sum())
 		selfSufficient=math.ceil(df4['production_SE3'].sum()/abs(df4['consumption_SE3'].sum())*1000)/10
 		print('Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh')
 		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh')
