@@ -23,12 +23,12 @@ def main(argv):
 
 	if not opts:
 		print('Usage:')
-		print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <std|oFile>')
+		print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile>')
 		sys.exit(1)
 	for opt, arg in opts:
 		if opt == '-h':
 			print('Usage:')
-			print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <std|oFile>')
+			print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile>')
 			sys.exit(1)
 		elif opt in ("-y", "--year"):
 			arg = int(arg)
