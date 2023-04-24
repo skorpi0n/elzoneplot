@@ -565,17 +565,19 @@ def main(argv):
 	#Plot the data
 	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label=importLabel) #, s=6
 	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label=exportLabel, ax=ax) #, s=6
-	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax) #, s=6
+	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax, figsize=(7, 6)) #, s=6
 
 	#Hide irrelevant names on axes.
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
 
+	print(textStr)
 	#Add text to the bottom
-	plt.text(5, -10, textStr)
+#	plt.text(5, -10, textStr)
+	plt.text(0.13, -0.08, textStr, transform = ax.transAxes)
 
 	sourceStr = 'Source: svk.se > Statistik per elområde och timme. Made with https://github.com/skorpi0n/elzoneplot'
-	plt.text(-15, -14, sourceStr, fontsize=8)
+	plt.text(-0.02, -0.12, sourceStr, fontsize=8, transform = ax.transAxes)
 
 	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
 	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
