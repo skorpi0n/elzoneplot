@@ -453,6 +453,20 @@ def main(argv):
 		'production_SE3':'sum',
 		'production_SE4':'sum'
 	}
+	
+	groupLyDict={
+		'hour':'hourly',
+		'day':'daily',
+		'week':'weekly',
+		'month':'monthly'
+	}
+	
+	dotSizeDict={
+		'hour':20,
+		'day':80,
+		'week':600,
+		'month':2000
+	}
 
 	#This sets the x and y position of each point
 	if groupby == '' or groupby == 'HOUR':
@@ -551,9 +565,9 @@ def main(argv):
 		))
 
 	if year == datetime.now().year:
-		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' (' + groupby.lower() + 'ly)'
+		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' (' + groupLyDict[groupby.lower()] + ')'
 	else:
-		title='Zone ' + str(zone) + ' ' + str(year) + ' (' + groupby.lower() + 'ly)'
+		title='Zone ' + str(zone) + ' ' + str(year) + ' (' + groupLyDict[groupby.lower()] + ')'
 
 	#These dataframes are just dummys to create labels for export/orange and import/grey
 	#Another solution would have been to split the main dataframe by color-value, but that caused colors with no data to not be displayed
@@ -561,9 +575,9 @@ def main(argv):
 	exportLabel_df = pd.DataFrame([[0, 0, export_color]], columns=['a', 'b', 'color'])
 
 	#Plot the data
-	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label=importLabel) #, s=6
-	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label=exportLabel, ax=ax) #, s=6
-	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax, figsize=(7, 6)) #, s=6
+	ax = importLabel_df.plot(kind='scatter', x='x', y='y', c='color', label=importLabel)
+	exportLabel_df.plot(kind='scatter', x='a', y='b', c='color', label=exportLabel, ax=ax)
+	df4.plot(kind='scatter', x='x', y='y', c='color', title=title, ax=ax, figsize=(7, 6), s = dotSizeDict[groupby.lower()])
 
 	#Hide irrelevant names on axes.
 	ax.axes.get_xaxis().set_visible(False)
@@ -577,8 +591,8 @@ def main(argv):
 	sourceStr = 'Source: svk.se > Statistik per elområde och timme. Made with https://github.com/skorpi0n/elzoneplot'
 	plt.text(-0.02, -0.12, sourceStr, fontsize=8, transform = ax.transAxes)
 
-	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
-	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupby.lower() + 'ly.png')
+	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupLyDict[groupby.lower()] + '.png')
+	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupLyDict[groupby.lower()] + '.png')
 
 	if output == 'STDOUT':
 #		pd.set_option('display.max_columns', None)
