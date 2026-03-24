@@ -1,43 +1,52 @@
+#TODO
+#Make conspumptionfraction visible in description aswell? No only in plot?
+
 from matplotlib import pyplot as plt
 import requests
+import arrow
 import pandas as pd
 import sys, getopt, math, os.path
 from datetime import datetime
 
-year = datetime.now().year
+#year = datetime.now().year
+maxYear = 2025
 zone = ''
 groupby = 'HOUR'
 output = ''
+flows = False
+consumptionFraction = 100
 
 def main(argv):
 	global year
 	global zone
 	global groupby
 	global output
+	global flows
+	global consumptionFraction
 
 	try:
-		opts, args = getopt.getopt(argv,"hy:z:g:o:",["year=","zone=","groupby=","output="])
+		opts, args = getopt.getopt(argv,"hy:z:g:o:fc:",["year=","zone=","groupby=","output=","flows=","consumptionfraction="])
 	except getopt.GetoptError as err:
 		print(err)
 		sys.exit(1)
 
 	if not opts:
 		print('Usage:')
-		print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile>')
+		print('elzoneplot.py -y <2007-', maxYear, '> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile> -f -c <50-100(default)>', sep='')
 		sys.exit(1)
 	for opt, arg in opts:
 		if opt == '-h':
 			print('Usage:')
-			print('elzoneplot.py -y <2007-> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile>')
+			print('elzoneplot.py -y <2007-', maxYear, '> -z <SE|SE1|SE2|SE3|SE4> -g <MONTH|WEEK|DAY|HOUR(default)> -o <plot|std|oFile> -f -c <50-100(default)>', sep='')
 			sys.exit(1)
 		elif opt in ("-y", "--year"):
 			arg = int(arg)
-			if arg >= 2007 and arg <= year:
+			if arg >= 2007 and arg <= maxYear:
 				year = arg
 #			elif  arg == '':
 #				zone = 'SE'
 			else:
-				print('Specified year ', arg, ' is not within range 2007 - ', year, sep='')
+				print('Specified year ', arg, ' is not within range 2007 - ', maxYear, sep='')
 				sys.exit()
 
 		elif opt in ("-z", "--zone"):
@@ -65,8 +74,21 @@ def main(argv):
 				output = 'PLOT'
 			else:
 				output = arg
+		elif opt in ("-f", "--flows"):
+			flows = True
+			if zone == 'SE':
+				print('Cant include domestic flows for zone SE')
+				sys.exit()
+		elif opt in ("-c", "--consumptionfraction"):
+			arg = int(arg)
+			if arg >= 50 and arg <= 100:
+				consumptionFraction = arg
+			else:
+				print('Specified value ', arg, ' is not within range 50 - 100', sep='')
+				sys.exit()
 
-	print('Year=', year, ', Zone=', zone, ', Groupby=', groupby, ', Output=', output, sep='')
+
+	print('Year=', year, ', Zone=', zone, ', Groupby=', groupby, ', Output=', output, ', Flows=', flows, ', Consumption Fraction=', consumptionFraction, sep='')
 
 	# Get data from file "Statistik per elområde och timme, 2022.xlsx"
 	# Statistics available at https://www.svk.se/om-kraftsystemet/kraftsystemdata/elstatistik/
@@ -91,9 +113,11 @@ def main(argv):
 		2020:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2020-01-12.xls',
 		2021:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2021-01-12.xls',
 		2022:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2022-01-12.xls',
-		2023:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/timvarden-2023-01-02.xls'
+		2023:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2023-01-12.xls',
+		2024:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2024-01-12_.xls',
+		2025:'https://www.svk.se/siteassets/1.om-kraftsystemet/kraftsystemdata/statistik/elomrade-och-timme/arkiverade/timvarden-2025-01-12.xls',
 	}
-	
+
 	#This dict contains the indexes for the consumption columns by year
 	consumptionDict={
 		2007:{
@@ -205,6 +229,18 @@ def main(argv):
 			'SE2':[2,6,10,14,39,43],
 			'SE3':[3,7,11,15,40,44],
 			'SE4':[4,8,12,16,41,45]
+		},
+		2024:{
+			'SE1':[1,5,9,13,38,42],
+			'SE2':[2,6,10,14,39,43],
+			'SE3':[3,7,11,15,40,44],
+			'SE4':[4,8,12,16,41,45]
+		},
+		2025:{
+			'SE1':[1,5,9,13,17,46,50],	#, energy storage added
+			'SE2':[2,6,10,14,18,47,51],
+			'SE3':[3,7,11,15,19,48,52],
+			'SE4':[4,8,12,16,20,49,53]
 		}
 	}
 
@@ -319,6 +355,18 @@ def main(argv):
 			'SE2':[18,22,26,   31,35],	#No nuclear
 			'SE3':[19,23,27,29,32,36],
 			'SE4':[20,24,28,   33,37]	#No nuclear
+		},
+		2024:{
+			'SE1':[17,21,25,   30,34,38],	#No nuclear, energy storage added
+			'SE2':[18,22,26,   31,35,39],	#No nuclear, energy storage added
+			'SE3':[19,23,27,29,32,36,40],	#			, energy storage added
+			'SE4':[20,24,28,   33,37,41]	#No nuclear, energy storage added
+		},
+		2025:{
+			'SE1':[21,25,29,   34,38,42],	#No nuclear, energy storage added
+			'SE2':[22,26,30,   35,39,43],	#No nuclear, energy storage added
+			'SE3':[23,27,31,29,36,40,44],	#			, energy storage added
+			'SE4':[24,28,32,   37,41,45]	#No nuclear, energy storage added
 		}
 	}
 
@@ -344,7 +392,9 @@ def main(argv):
 		2020:[1,2,3,4],
 		2021:[1,2,3,4],
 		2022:[1,2,3,4],
-		2023:[1,2,3,4]
+		2023:[1,2,3,4],
+		2024:[1,2,3,4],
+		2025:[1,2,3,4]
 	}
 
 	def getDataframe(fname, year, i=-1):
@@ -362,7 +412,7 @@ def main(argv):
 			print('Saving file to: ',fname)
 			open(fname, 'wb').write(r.content)
 
-		#Cant use skiprows at at fixed value since data starts at different indexes between different files
+		#Cant use skiprows at a fixed value since data starts at different indexes between different files
 		#However, it looks to be consistent that the data starts at the row below first complete empty row.
 		if i == -1:
 			df = pd.read_excel(fname, header=0, skiprows=skipRowsDict[year])
@@ -388,36 +438,87 @@ def main(argv):
 		df2['year'] = df2['datetime'].dt.isocalendar().year
 		df2['week'] = df2['datetime'].dt.isocalendar().week
 
+		#This is needed for year 2010 which has two .xls for same year
 		if i == -1:
-			df2['consumption_SE1']= df.iloc[:, consumptionDict[year]['SE1']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE2']= df.iloc[:, consumptionDict[year]['SE2']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE3']= df.iloc[:, consumptionDict[year]['SE3']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE4']= df.iloc[:, consumptionDict[year]['SE4']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE']= df2['consumption_SE1']+df2['consumption_SE2']+df2['consumption_SE3']+df2['consumption_SE4']
+			df2['consumption_SE1']=df.iloc[:, consumptionDict[year]['SE1']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE2']=df.iloc[:, consumptionDict[year]['SE2']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE3']=df.iloc[:, consumptionDict[year]['SE3']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE4']=df.iloc[:, consumptionDict[year]['SE4']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE']=df2['consumption_SE1']+df2['consumption_SE2']+df2['consumption_SE3']+df2['consumption_SE4']
 			
-			df2['production_SE1']= df.iloc[:, productionDict[year]['SE1']].sum(axis=1,numeric_only=True)
-			df2['production_SE2']= df.iloc[:, productionDict[year]['SE2']].sum(axis=1,numeric_only=True)
-			df2['production_SE3']= df.iloc[:, productionDict[year]['SE3']].sum(axis=1,numeric_only=True)
-			df2['production_SE4']= df.iloc[:, productionDict[year]['SE4']].sum(axis=1,numeric_only=True)
-			df2['production_SE']= df2['production_SE1']+df2['production_SE2']+df2['production_SE3']+df2['production_SE4']
+			df2['production_SE1']=df.iloc[:, productionDict[year]['SE1']].sum(axis=1,numeric_only=True)
+			df2['production_SE2']=df.iloc[:, productionDict[year]['SE2']].sum(axis=1,numeric_only=True)
+			df2['production_SE3']=df.iloc[:, productionDict[year]['SE3']].sum(axis=1,numeric_only=True)
+			df2['production_SE4']=df.iloc[:, productionDict[year]['SE4']].sum(axis=1,numeric_only=True)
+			df2['production_SE']=df2['production_SE1']+df2['production_SE2']+df2['production_SE3']+df2['production_SE4']
 		else:
-			df2['consumption_SE1']= df.iloc[:, consumptionDict[year][i]['SE1']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE2']= df.iloc[:, consumptionDict[year][i]['SE2']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE3']= df.iloc[:, consumptionDict[year][i]['SE3']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE4']= df.iloc[:, consumptionDict[year][i]['SE4']].sum(axis=1,numeric_only=True)
-			df2['consumption_SE']= df2['consumption_SE1']+df2['consumption_SE2']+df2['consumption_SE3']+df2['consumption_SE4']
+			df2['consumption_SE1']=df.iloc[:, consumptionDict[year][i]['SE1']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE2']=df.iloc[:, consumptionDict[year][i]['SE2']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE3']=df.iloc[:, consumptionDict[year][i]['SE3']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE4']=df.iloc[:, consumptionDict[year][i]['SE4']].sum(axis=1,numeric_only=True)
+			df2['consumption_SE']=df2['consumption_SE1']+df2['consumption_SE2']+df2['consumption_SE3']+df2['consumption_SE4']
 			
-			df2['production_SE1']= df.iloc[:, productionDict[year][i]['SE1']].sum(axis=1,numeric_only=True)
-			df2['production_SE2']= df.iloc[:, productionDict[year][i]['SE2']].sum(axis=1,numeric_only=True)
-			df2['production_SE3']= df.iloc[:, productionDict[year][i]['SE3']].sum(axis=1,numeric_only=True)
-			df2['production_SE4']= df.iloc[:, productionDict[year][i]['SE4']].sum(axis=1,numeric_only=True)
-			df2['production_SE']= df2['production_SE1']+df2['production_SE2']+df2['production_SE3']+df2['production_SE4']
-		
-		df2['balance_SE']= df2['consumption_SE']+df2['production_SE']
-		df2['balance_SE1']= df2['consumption_SE1']+df2['production_SE1']
-		df2['balance_SE2']= df2['consumption_SE2']+df2['production_SE2']
-		df2['balance_SE3']= df2['consumption_SE3']+df2['production_SE3']
-		df2['balance_SE4']= df2['consumption_SE4']+df2['production_SE4']
+			df2['production_SE1']=df.iloc[:, productionDict[year][i]['SE1']].sum(axis=1,numeric_only=True)
+			df2['production_SE2']=df.iloc[:, productionDict[year][i]['SE2']].sum(axis=1,numeric_only=True)
+			df2['production_SE3']=df.iloc[:, productionDict[year][i]['SE3']].sum(axis=1,numeric_only=True)
+			df2['production_SE4']=df.iloc[:, productionDict[year][i]['SE4']].sum(axis=1,numeric_only=True)
+			df2['production_SE']=df2['production_SE1']+df2['production_SE2']+df2['production_SE3']+df2['production_SE4']
+				
+		df2['balance_SE']=df2['consumption_SE'] + df2['production_SE']
+		df2['balance_SE1']=df2['consumption_SE1'] + df2['production_SE1']
+		df2['balance_SE2']=df2['consumption_SE2'] + df2['production_SE2']
+		df2['balance_SE3']=df2['consumption_SE3'] + df2['production_SE3']
+		df2['balance_SE4']=df2['consumption_SE4'] + df2['production_SE4']
+
+		df2['balance_with_' + str(consumptionFraction) + '_consumption_SE']=(df2['consumption_SE']*(consumptionFraction/100)) + df2['production_SE']
+		df2['balance_with_' + str(consumptionFraction) + '_consumption_SE1']=(df2['consumption_SE1']*(consumptionFraction/100)) + df2['production_SE1']
+		df2['balance_with_' + str(consumptionFraction) + '_consumption_SE2']=(df2['consumption_SE2']*(consumptionFraction/100)) + df2['production_SE2']
+		df2['balance_with_' + str(consumptionFraction) + '_consumption_SE3']=(df2['consumption_SE3']*(consumptionFraction/100)) + df2['production_SE3']
+		df2['balance_with_' + str(consumptionFraction) + '_consumption_SE4']=(df2['consumption_SE4']*(consumptionFraction/100)) + df2['production_SE4']
+
+		if flows:
+			#Read flowdata from csv
+			fname='flows/svkstats_flowHour_' + str(year) +'_SE.csv'
+			url='https://github.com/skorpi0n/elzoneplot/flows/' + fname
+			if not os.path.isfile(fname):
+				print('Flow data was not found locally, trying to fetch it remotely')
+				try:
+					print('Fetching url: ', url)
+					r = requests.get(url)
+					r.raise_for_status()
+					print('Saving flows file to: ', fname)
+					open(fname, 'wb').write(r.content)
+				except requests.exceptions.RequestException as e:
+					if r.status_code == 404:
+						print('ERROR: No flow data is available for year ' + str(year))
+						sys.exit(1)
+					else:
+						print('ERROR:')
+						raise SystemExit(e)
+
+			csv_df = pd.read_csv(fname)
+
+			#csv_df values are in KW, so we make them to MW to fit df2
+			df2['domestic_export_SE1']=(csv_df['SE1_SE2'] + (csv_df['FI_SE1']*-1) + (csv_df['NO4_SE1']*-1)) / 1000
+			df2['domestic_export_SE2']=((csv_df['SE1_SE2']*-1) + csv_df['SE2_SE3'] + (csv_df['NO3_SE2']*-1) + (csv_df['NO4_SE2']*-1)) / 1000
+			df2['domestic_export_SE3']=((csv_df['SE2_SE3']*-1) + csv_df['SE3_SE4'] + (csv_df['DK1_SE3']*-1) + (csv_df['FI_SE3']*-1) + (csv_df['NO1_SE3']*-1)) / 1000
+			df2['domestic_export_SE4']=((csv_df['SE3_SE4']*-1) + csv_df['SE4_DK2'] + csv_df['SE4_PL'] + (csv_df['DE_SE4']*-1) + (csv_df['LT_SE4']*-1)) / 1000
+
+			#We can always use the column "balance_with_" for balance since it either defaults to 100% if not used
+			df2['balance_after_domestic_export_SE1']= df2['balance_with_' + str(consumptionFraction) + '_consumption_SE1'] + (df2['domestic_export_SE1']*-1)
+			df2['balance_after_domestic_export_SE2']= df2['balance_with_' + str(consumptionFraction) + '_consumption_SE2'] + (df2['domestic_export_SE2']*-1)
+			df2['balance_after_domestic_export_SE3']= df2['balance_with_' + str(consumptionFraction) + '_consumption_SE3'] + (df2['domestic_export_SE3']*-1)
+			df2['balance_after_domestic_export_SE4']= df2['balance_with_' + str(consumptionFraction) + '_consumption_SE4'] + (df2['domestic_export_SE4']*-1)
+		else:
+			df2['domestic_export_SE1']=''
+			df2['domestic_export_SE2']=''
+			df2['domestic_export_SE3']=''
+			df2['domestic_export_SE4']=''
+	
+			df2['balance_after_domestic_export_SE1']=''
+			df2['balance_after_domestic_export_SE2']=''
+			df2['balance_after_domestic_export_SE3']=''
+			df2['balance_after_domestic_export_SE4']=''
 
 		return df2
 
@@ -471,10 +572,13 @@ def main(argv):
 	#This sets the x and y position of each point
 	if groupby == '' or groupby == 'HOUR':
 		df4=df3[[
-			'datetime','year','week',
-			'balance_SE','balance_SE1','balance_SE2','balance_SE3','balance_SE4',
-			'consumption_SE','consumption_SE1','consumption_SE2','consumption_SE3','consumption_SE4',
-			'production_SE','production_SE1','production_SE2','production_SE3','production_SE4'
+			'datetime', 'year', 'week',
+			'balance_SE', 'balance_SE1', 'balance_SE2', 'balance_SE3', 'balance_SE4',
+			'consumption_SE', 'consumption_SE1', 'consumption_SE2', 'consumption_SE3', 'consumption_SE4',
+			'production_SE', 'production_SE1', 'production_SE2', 'production_SE3', 'production_SE4',
+			'domestic_export_SE1', 'domestic_export_SE2', 'domestic_export_SE3', 'domestic_export_SE4',
+			'balance_after_domestic_export_SE1', 'balance_after_domestic_export_SE2', 'balance_after_domestic_export_SE3', 'balance_after_domestic_export_SE4',
+			'balance_with_' + str(consumptionFraction) + '_consumption_SE', 'balance_with_' + str(consumptionFraction) + '_consumption_SE1', 'balance_with_' + str(consumptionFraction) + '_consumption_SE2', 'balance_with_' + str(consumptionFraction) + '_consumption_SE3', 'balance_with_' + str(consumptionFraction) + '_consumption_SE4'
 		]].copy()
 		df4['hour']=df4.index
 		df4['y']=df4['hour'].apply(lambda x: int(x/120))
@@ -495,74 +599,39 @@ def main(argv):
 		df4['y']=df4['hour'].apply(lambda x: int(x/3))
 		df4['x']=df4['hour'].apply(lambda x: int(x%3))
 
+	selfSufficiency=math.ceil(df4['production_' + zone].sum()/abs(df4['consumption_' + zone].sum())*1000)/10
+
+	#If balance should include domestic flows, use another balance column for the plot and other description
+	if flows:
+		balanceCol='balance_after_domestic_export_'
+		plotDescStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_' + zone].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_' + zone].sum()))) + ' MWh | Balance: ' + str(math.ceil(df4['balance_' + zone].sum())) + ' MWh',
+			r'Domestic export: ' + str(math.ceil(df4['domestic_export_' + zone].sum())) + ' MWh | Foreign export: ' + str(math.ceil(df4['balance_after_domestic_export_' + zone].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficiency) + '%'
+		))
+	elif consumptionFraction != 100:
+		balanceCol='balance_with_' + str(consumptionFraction) + '_consumption_'
+		plotDescStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_' + zone].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_' + zone].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4[balanceCol + zone].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficiency) + '%'
+		))
+	else:
+		balanceCol='balance_'
+		plotDescStr = '\n'.join((
+			r'Production: ' + str(math.ceil(df4['production_' + zone].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_' + zone].sum()))) + ' MWh',
+			r'Balance: ' + str(math.ceil(df4[balanceCol + zone].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficiency) + '%'
+		))
+
+	#Colorize a column based on value of balance in zone
 	export_color = 'orange'
 	import_color = 'grey'
-	#Colorize a column based on value of balance in zone
-	if zone == 'SE':
-		df4['color'] = df4['balance_SE'].apply(lambda x: export_color if x > 0 else import_color)
-		importLabel='Import (' + str((df4['balance_SE'] < 0).sum()) + ' ' + groupby.lower() + 's)'
-		exportLabel='Export (' + str((df4['balance_SE'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		selfSufficient=math.ceil(df4['production_SE'].sum()/abs(df4['consumption_SE'].sum())*1000)/10
-		print('Production: ' + str(math.ceil(df4['production_SE'].sum())) + ' MWh')
-		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE'].sum()))) + ' MWh')
-		print('Balance: ' + str(math.ceil(df4['balance_SE'].sum())) + ' MWh')
-		print('Self-sufficient: ' + str(selfSufficient) + '%')
-		textStr = '\n'.join((
-			r'Production: ' + str(math.ceil(df4['production_SE'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE'].sum()))) + ' MWh',
-			r'Balance: ' + str(math.ceil(df4['balance_SE'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
-		))
-	elif zone == 'SE1':
-		df4['color'] = df4['balance_SE1'].apply(lambda x: export_color if x > 0 else import_color)
-		importLabel='Import (' + str((df4['balance_SE1'] < 0).sum()) + ' ' + groupby.lower() + 's)'
-		exportLabel='Export (' + str((df4['balance_SE1'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		selfSufficient=math.ceil(df4['production_SE1'].sum()/abs(df4['consumption_SE1'].sum())*1000)/10
-		print('Production: ' + str(math.ceil(df4['production_SE1'].sum())) + ' MWh')
-		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE1'].sum()))) + ' MWh')
-		print('Balance: ' + str(math.ceil(df4['balance_SE1'].sum())) + ' MWh')
-		print('Self-sufficient: ' + str(selfSufficient) + '%')
-		textStr = '\n'.join((
-			r'Production: ' + str(math.ceil(df4['production_SE1'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE1'].sum()))) + ' MWh',
-			r'Balance: ' + str(math.ceil(df4['balance_SE1'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
-		))
-	elif zone == 'SE2':
-		df4['color'] = df4['balance_SE2'].apply(lambda x: export_color if x > 0 else import_color)
-		importLabel='Import (' + str((df4['balance_SE2'] < 0).sum()) + ' ' + groupby.lower() + 's)'
-		exportLabel='Export (' + str((df4['balance_SE2'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		selfSufficient=math.ceil(df4['production_SE2'].sum()/abs(df4['consumption_SE2'].sum())*1000)/10
-		print('Production: ' + str(math.ceil(df4['production_SE2'].sum())) + ' MWh')
-		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE2'].sum()))) + ' MWh')
-		print('Balance: ' + str(math.ceil(df4['balance_SE2'].sum())) + ' MWh')
-		print('Self-sufficient: ' + str(selfSufficient) + '%')
-		textStr = '\n'.join((
-			r'Production: ' + str(math.ceil(df4['production_SE2'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE2'].sum()))) + ' MWh',
-			r'Balance: ' + str(math.ceil(df4['balance_SE2'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
-		))
-	elif zone == 'SE3':
-		df4['color'] = df4['balance_SE3'].apply(lambda x: export_color if x > 0 else import_color)
-		importLabel='Import (' + str((df4['balance_SE3'] < 0).sum()) + ' ' + groupby.lower() + 's)'
-		exportLabel='Export (' + str((df4['balance_SE3'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		selfSufficient=math.ceil(df4['production_SE3'].sum()/abs(df4['consumption_SE3'].sum())*1000)/10
-		print('Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh')
-		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh')
-		print('Balance: ' + str(math.ceil(df4['balance_SE3'].sum())) + ' MWh')
-		print('Self-sufficient: ' + str(selfSufficient) + '%')
-		textStr = '\n'.join((
-			r'Production: ' + str(math.ceil(df4['production_SE3'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE3'].sum()))) + ' MWh',
-			r'Balance: ' + str(math.ceil(df4['balance_SE3'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
-		))
-	elif zone == 'SE4':
-		df4['color'] = df4['balance_SE4'].apply(lambda x: export_color if x > 0 else import_color)
-		importLabel='Import (' + str((df4['balance_SE4'] < 0).sum()) + ' ' + groupby.lower() + 's)'
-		exportLabel='Export (' + str((df4['balance_SE4'] >= 0).sum()) + ' ' + groupby.lower() + 's)'
-		selfSufficient=math.ceil(df4['production_SE4'].sum()/abs(df4['consumption_SE4'].sum())*1000)/10
-		print('Production: ' + str(math.ceil(df4['production_SE4'].sum())) + ' MWh')
-		print('Consumption: ' + str(math.ceil(abs(df4['consumption_SE4'].sum()))) + ' MWh')
-		print('Balance: ' + str(math.ceil(df4['balance_SE4'].sum())) + ' MWh')
-		print('Self-sufficient to: ' + str(selfSufficient) + '%')
-		textStr = '\n'.join((
-			r'Production: ' + str(math.ceil(df4['production_SE4'].sum())) + ' MWh | Consumption: ' + str(math.ceil(abs(df4['consumption_SE4'].sum()))) + ' MWh',
-			r'Balance: ' + str(math.ceil(df4['balance_SE4'].sum())) + ' MWh | Self-sufficiency: ' + str(selfSufficient) + '%'
-		))
+	df4['color'] = df4[balanceCol + zone].apply(lambda x: import_color if x < 0 else export_color)
+	importLabel='Import (' + str((df4[balanceCol + zone] < 0).sum()) + ' ' + groupby.lower() + 's)'
+	exportLabel='Export (' + str((df4[balanceCol + zone] >= 0).sum()) + ' ' + groupby.lower() + 's)'
+
+	print('Production: ' + str(math.ceil(df4['production_' + zone].sum())) + ' MWh')
+	print('Consumption: ' + str(math.ceil(abs(df4['consumption_' + zone].sum()))) + ' MWh')
+	print('Balance: ' + str(math.ceil(df4['balance_' + zone].sum())) + ' MWh')
+	print('Self-sufficient: ' + str(selfSufficiency) + '%')
 
 	if year == datetime.now().year:
 		title='NOTE! Data only to ' + str(df4['datetime'].iloc[-1]) + '\nZone ' + str(zone) + ' ' + str(year) + ' (' + groupLyDict[groupby.lower()] + ')'
@@ -583,13 +652,27 @@ def main(argv):
 	ax.axes.get_xaxis().set_visible(False)
 	ax.axes.get_yaxis().set_visible(False)
 
-	print(textStr)
+	#Add disclaimer when flows are used to include domestic export/import
+	if flows:
+		font = {'color':'black','weight':'bold','size': 10}
+		box = {'facecolor': 'red','edgecolor': 'green','boxstyle': 'round', 'alpha':0.2}
+		flowsDiscStr = 'DISCLAIMER! Domestic export/import is included by using\nESTIMATED flows taken from\nSvenska Kraftnät - Kontrollrummet\nThis causes a mix of actual and estimated results!'
+		plt.text(60, 45, '\n' + flowsDiscStr +'\n', ha = 'center', va = 'center', fontdict=font, bbox=box)
+		print('\n' + flowsDiscStr + '\n')
+
+	#Add disclaimer when consumption is lowered by factor to see how close the selfsufficiency really is
+	if consumptionFraction != 100:
+		font = {'color':'black','weight':'bold','size': 10}
+		box = {'facecolor': 'red','edgecolor': 'green','boxstyle': 'round', 'alpha':0.2}
+		consumptionFractionDiscStr = 'DISCLAIMER! Zone consumption is ' + str(consumptionFraction) + '% of actual value\nThis only affect the plot!'
+		plt.text(60, 25, '\n'+ consumptionFractionDiscStr + '\n', ha = 'center', va = 'center', fontdict=font, bbox=box)
+		print('\n' + consumptionFractionDiscStr + '\n')
+
 	#Add text to the bottom
-#	plt.text(5, -10, textStr)
-	plt.text(0.13, -0.08, textStr, transform = ax.transAxes)
+	plt.text(0.51, -0.015, plotDescStr, ha = 'center', va = 'top', transform = ax.transAxes)
 
 	sourceStr = 'Source: svk.se > Statistik per elområde och timme. Made with https://github.com/skorpi0n/elzoneplot'
-	plt.text(-0.02, -0.12, sourceStr, fontsize=8, transform = ax.transAxes)
+	plt.text(0.5, -0.1, sourceStr, fontsize=8, ha = 'center', va = 'top', transform = ax.transAxes)
 
 	ax.figure.savefig('elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupLyDict[groupby.lower()] + '.png')
 	print('Saved plot to: ' + 'elzoneplot_' + str(zone) + '_' + str(year) + '_' + groupLyDict[groupby.lower()] + '.png')
