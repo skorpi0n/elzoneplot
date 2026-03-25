@@ -365,7 +365,7 @@ def main(argv):
 		2025:{
 			'SE1':[21,25,29,   34,38,42],	#No nuclear, energy storage added
 			'SE2':[22,26,30,   35,39,43],	#No nuclear, energy storage added
-			'SE3':[23,27,31,29,36,40,44],	#			, energy storage added
+			'SE3':[23,27,31,33,36,40,44],	#			, energy storage added
 			'SE4':[24,28,32,   37,41,45]	#No nuclear, energy storage added
 		}
 	}
